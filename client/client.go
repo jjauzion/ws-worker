@@ -1,19 +1,19 @@
 package client
 
 import (
+	"context"
 	"google.golang.org/grpc"
 	"log"
 	"time"
-	"context"
 
 	pb "github.com/jjauzion/ws-worker/proto"
 )
 
 const (
-	address     = "localhost:50051"
+	address = "localhost:8090"
 )
 
-func main() {
+func Run() {
 	// Set up a connection to the server.
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
