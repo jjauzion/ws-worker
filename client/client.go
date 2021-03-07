@@ -16,8 +16,6 @@ func Run() {
 		log.Panic(err)
 	}
 	address := cf.WS_GRPC_HOST + ":" + cf.WS_GRPC_PORT
-	//lg.Info("...", zap.String("address", address0))
-	//address := "localhost:8090"
 	lg.Info("connecting to grpc server", zap.String("address", address))
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
@@ -27,11 +25,18 @@ func Run() {
 	lg.Info("connection acquired")
 	c := pb.NewApiClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 45 * time.Second)
 	defer cancel()
-	r, err := c.StartTask(ctx, &pb.StartTaskReq{WithGPU: false})
-	if err != nil {
-		log.Fatalf("could not greet: %v", err)
+	for {
+		time.Sleep(5 * time.Second)
+		r, err := c.StartTask(ctx, &pb.StartTaskReq{WithGPU: false})
+		if getErrorCode(err) == getErrorCode(errNoTasksInQueue) {
+			lg.Info("no task in queue")
+			continue
+		} else if err != nil {
+			lg.Error("failed to start task", zap.Error(err))
+			return
+		}
+		lg.Info("start task image", zap.String("image", r.Job.DockerImage), zap.String("dataset", r.Job.Dataset))
 	}
-	log.Printf("image: %s\ndataset: %s\n", r.Job.DockerImage, r.Job.Dataset)
 }
