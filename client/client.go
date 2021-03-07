@@ -10,6 +10,10 @@ import (
 	pb "github.com/jjauzion/ws-worker/proto"
 )
 
+const (
+	sleepBetweenCall = 30 * time.Second
+)
+
 func Run() {
 	lg, cf, err := dependencies()
 	if err != nil {
@@ -25,13 +29,13 @@ func Run() {
 	lg.Info("connection acquired")
 	c := pb.NewApiClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 45 * time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
+	lg.Info("pulling new task...", zap.Duration("sleep", sleepBetweenCall))
 	for {
-		time.Sleep(5 * time.Second)
-		r, err := c.StartTask(ctx, &pb.StartTaskReq{WithGPU: false})
+		time.Sleep(sleepBetweenCall)
+		r, err := c.StartTask(ctx, &pb.StartTaskReq{WithGPU: true})
 		if getErrorCode(err) == getErrorCode(errNoTasksInQueue) {
-			lg.Info("no task in queue")
 			continue
 		} else if err != nil {
 			lg.Error("failed to start task", zap.Error(err))
