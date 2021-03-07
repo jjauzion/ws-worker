@@ -1,5 +1,5 @@
 # Project specific
-ws-backend
+ws-worker
 
 # Environment
 .env
