@@ -1,0 +1,3 @@
+ES_USER_MAPPING: "Elasticsearch/user_mapping.json"
+ES_TASK_MAPPING: "Elasticsearch/task_mapping.json"
+BOOTSTRAP_FILE: "Elasticsearch/bootstrap.bulk"

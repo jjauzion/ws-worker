@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"log"
 	"time"
@@ -9,17 +10,21 @@ import (
 	pb "github.com/jjauzion/ws-worker/proto"
 )
 
-const (
-	address = "localhost:8090"
-)
-
 func Run() {
-	// Set up a connection to the server.
+	lg, cf, err := dependencies()
+	if err != nil {
+		log.Panic(err)
+	}
+	address := cf.WS_GRPC_HOST + ":" + cf.WS_GRPC_PORT
+	//lg.Info("...", zap.String("address", address0))
+	//address := "localhost:8090"
+	lg.Info("connecting to grpc server", zap.String("address", address))
 	conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
-		log.Fatalf("did not connect: %v", err)
+		lg.Panic("failed to connect", zap.Error(err))
 	}
 	defer conn.Close()
+	lg.Info("connection acquired")
 	c := pb.NewApiClient(conn)
 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
