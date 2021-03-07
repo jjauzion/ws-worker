@@ -29,8 +29,7 @@ func Run() {
 	lg.Info("connection acquired")
 	c := pb.NewApiClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
-	defer cancel()
+	ctx := context.Background()
 	lg.Info("pulling new task...", zap.Duration("sleep", sleepBetweenCall))
 	for {
 		time.Sleep(sleepBetweenCall)
