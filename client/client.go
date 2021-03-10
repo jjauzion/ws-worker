@@ -32,9 +32,9 @@ func Run() {
 	ctx := context.Background()
 	lg.Info("pulling new task...", zap.Duration("sleep", sleepBetweenCall))
 	for {
-		time.Sleep(sleepBetweenCall)
 		r, err := c.StartTask(ctx, &pb.StartTaskReq{WithGPU: true})
 		if getErrorCode(err) == getErrorCode(errNoTasksInQueue) {
+			time.Sleep(sleepBetweenCall)
 			continue
 		} else if err != nil {
 			lg.Error("failed to start task", zap.Error(err))
