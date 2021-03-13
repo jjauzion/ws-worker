@@ -15,7 +15,7 @@ const (
 )
 
 func Run() {
-	lg, cf, err := dependencies()
+	lg, cf, dh, err := dependencies()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -41,7 +41,6 @@ func Run() {
 			return
 		}
 		lg.Info("start task image", zap.String("image", r.Job.DockerImage), zap.String("dataset", r.Job.Dataset))
-		dh := DockerHandler{}
-		dh.new(ctx, lg, cf)
+		dh.runImage(ctx, r.Job.DockerImage)
 	}
 }
