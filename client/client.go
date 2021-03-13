@@ -41,5 +41,7 @@ func Run() {
 			return
 		}
 		lg.Info("start task image", zap.String("image", r.Job.DockerImage), zap.String("dataset", r.Job.Dataset))
+		dh := DockerHandler{}
+		dh.new(ctx, lg, cf)
 	}
 }
