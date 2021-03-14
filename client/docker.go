@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/mount"
 	"github.com/docker/docker/client"
 	"github.com/docker/docker/pkg/stdcopy"
 	"github.com/jjauzion/ws-worker/conf"
@@ -31,10 +32,12 @@ func (dh *DockerHandler) new(log *logger.Logger, config conf.Configuration) erro
 	return nil
 }
 
-func (dh *DockerHandler) runImage(ctx context.Context, image string) {
+func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
+	dh.log.Info("running container", zap.String("image", image))
 	reader, err := dh.client.ImagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
 		dh.log.Error("failed to pull image", zap.Error(err))
+		return err
 	}
 	dh.log.Info("docker says:")
 	io.Copy(os.Stdout, reader)
@@ -44,18 +47,39 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) {
 	//	dh.log.Info("docker says", zap.String("", s))
 	//}
 
-	resp, err := dh.client.ContainerCreate(ctx, &container.Config{
-		Image: image,
-		//Cmd:   []string{"echo", "hello world"},
-		Tty: false,
-	}, nil, nil, nil, "")
+	volumes := []mount.Mount{
+		{
+			Type:   mount.TypeBind,
+			Source: dh.config.WS_DOCKER_LOG_FOLDER,
+			Target: "/logs",
+		},
+		{
+			Type:   mount.TypeBind,
+			Source: dh.config.WS_DOCKER_RESULT_FOLDER,
+			Target: "/result",
+		},
+	}
+	resp, err := dh.client.ContainerCreate(
+		ctx,
+		&container.Config{
+			Image: image,
+			Tty:   false,
+		},
+		&container.HostConfig{
+			Mounts: volumes,
+		},
+		nil,
+		nil,
+		"")
 	if err != nil {
 		dh.log.Error("failed to create container", zap.Error(err))
+		return err
 	}
 
 	err = dh.client.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		dh.log.Error("failed to start container", zap.Error(err))
+		return err
 	}
 
 	statusCh, errCh := dh.client.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
@@ -63,6 +87,7 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) {
 	case err := <-errCh:
 		if err != nil {
 			dh.log.Error("", zap.Error(err))
+			return err
 		}
 	case <-statusCh:
 	}
@@ -70,8 +95,10 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) {
 	out, err := dh.client.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
 	if err != nil {
 		dh.log.Error("", zap.Error(err))
+		return err
 	}
 
 	dh.log.Info("container says:")
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
+	return nil
 }

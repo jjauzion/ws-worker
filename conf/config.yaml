@@ -1,3 +1,2 @@
-ES_USER_MAPPING: "Elasticsearch/user_mapping.json"
-ES_TASK_MAPPING: "Elasticsearch/task_mapping.json"
-BOOTSTRAP_FILE: "Elasticsearch/bootstrap.bulk"
+WS_DOCKER_LOG_FOLDER: "/Users/jjauzion/42/ws-worker/.logs/"
+WS_DOCKER_RESULT_FOLDER: "/Users/jjauzion/42/ws-worker/.results/"

@@ -37,10 +37,18 @@ func Run() {
 			time.Sleep(sleepBetweenCall)
 			continue
 		} else if err != nil {
+			time.Sleep(sleepBetweenCall)
 			lg.Error("failed to start task", zap.Error(err))
-			return
+			continue
 		}
-		lg.Info("start task image", zap.String("image", r.Job.DockerImage), zap.String("dataset", r.Job.Dataset))
-		dh.runImage(ctx, r.Job.DockerImage)
+		lg.Info("started task", zap.String("id", r.TaskId))
+		err = dh.runImage(ctx, r.Job.DockerImage)
+		if err != nil {
+			lg.Error("", zap.Error(err))
+		}
+		_, err = c.EndTask(ctx, &pb.EndTaskReq{TaskId: r.TaskId})
+		if err != nil {
+			lg.Error("failed to end task", zap.Error(err))
+		}
 	}
 }
