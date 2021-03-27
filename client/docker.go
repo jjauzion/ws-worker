@@ -2,6 +2,8 @@ package client
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"path"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
@@ -13,6 +15,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"os"
+	"strings"
 )
 
 type DockerHandler struct {
@@ -40,8 +43,21 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
 		dh.log.Error("failed to pull image", zap.Error(err))
 		return err
 	}
-	dh.log.Info("docker says:")
-	io.Copy(os.Stdout, reader)
+	buf := new(strings.Builder)
+	io.Copy(buf, reader)
+	str := strings.Split(buf.String(), "\n")
+	for _, s := range str {
+		if s != "" {
+			simple := struct {
+				Status string `json:"status"`
+			}{}
+			err := json.Unmarshal([]byte(s), &simple)
+			if err != nil {
+				return fmt.Errorf("cannot unmarshal: %w", err)
+			}
+			dh.log.Info("docker " + simple.Status)
+		}
+	}
 	//buf := new(strings.Builder)
 	//str := strings.Split(buf.String(), "\n")
 	//for _, s := range str {
