@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"path"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -47,15 +48,19 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
 	//	dh.log.Info("docker says", zap.String("", s))
 	//}
 
+	dir, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
 	volumes := []mount.Mount{
 		{
 			Type:   mount.TypeBind,
-			Source: dh.config.WS_DOCKER_LOG_FOLDER,
+			Source: path.Join(dir, dh.config.WS_DOCKER_LOG_FOLDER),
 			Target: "/logs",
 		},
 		{
 			Type:   mount.TypeBind,
-			Source: dh.config.WS_DOCKER_RESULT_FOLDER,
+			Source: path.Join(dir, dh.config.WS_DOCKER_RESULT_FOLDER),
 			Target: "/result",
 		},
 	}
