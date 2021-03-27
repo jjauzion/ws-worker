@@ -58,11 +58,6 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
 			dh.log.Info("docker " + simple.Status)
 		}
 	}
-	//buf := new(strings.Builder)
-	//str := strings.Split(buf.String(), "\n")
-	//for _, s := range str {
-	//	dh.log.Info("docker says", zap.String("", s))
-	//}
 
 	dir, err := os.Getwd()
 	if err != nil {
