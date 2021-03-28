@@ -6,8 +6,10 @@ import (
 )
 
 type Configuration struct {
-	WS_GRPC_HOST string
-	WS_GRPC_PORT string
+	WS_GRPC_HOST            string
+	WS_GRPC_PORT            string
+	WS_DOCKER_LOG_FOLDER    string
+	WS_DOCKER_RESULT_FOLDER string
 }
 
 func GetConfig(log *logger.Logger) (Configuration, error) {

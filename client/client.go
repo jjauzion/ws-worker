@@ -15,7 +15,7 @@ const (
 )
 
 func Run() {
-	lg, cf, err := dependencies()
+	lg, cf, dh, err := dependencies()
 	if err != nil {
 		log.Panic(err)
 	}
@@ -38,8 +38,17 @@ func Run() {
 			continue
 		} else if err != nil {
 			lg.Error("failed to start task", zap.Error(err))
-			return
+			time.Sleep(sleepBetweenCall)
+			continue
 		}
-		lg.Info("start task image", zap.String("image", r.Job.DockerImage), zap.String("dataset", r.Job.Dataset))
+		lg.Info("starting task", zap.String("id", r.TaskId))
+		err = dh.runImage(ctx, r.Job.DockerImage)
+		if err != nil {
+			lg.Error("", zap.Error(err))
+		}
+		_, err = c.EndTask(ctx, &pb.EndTaskReq{TaskId: r.TaskId})
+		if err != nil {
+			lg.Error("failed to end task", zap.Error(err))
+		}
 	}
 }

@@ -3,10 +3,11 @@ package client
 import (
 	"github.com/jjauzion/ws-worker/conf"
 	"github.com/jjauzion/ws-worker/internal/logger"
+	"go.uber.org/zap"
 	"log"
 )
 
-func dependencies() (*logger.Logger, conf.Configuration, error) {
+func dependencies() (*logger.Logger, conf.Configuration, *DockerHandler, error) {
 	lg, err := logger.ProvideLogger()
 	if err != nil {
 		log.Fatalf("cannot create logger %v", err)
@@ -14,8 +15,14 @@ func dependencies() (*logger.Logger, conf.Configuration, error) {
 
 	cf, err := conf.GetConfig(lg)
 	if err != nil {
-		log.Fatalf("cannot get config %v", err)
+		lg.Error("cannot get config", zap.Error(err))
 	}
 
-	return lg, cf, nil
+	dh := &DockerHandler{}
+	err = dh.new(lg, cf)
+	if err != nil {
+		lg.Error("cannot get DockerHandler", zap.Error(err))
+	}
+
+	return lg, cf, dh, nil
 }

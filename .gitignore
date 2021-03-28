@@ -1,5 +1,7 @@
 # Project specific
 ws-worker
+.logs
+.results
 
 # Environment
 .env
