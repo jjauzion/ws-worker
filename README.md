@@ -143,4 +143,6 @@ This will start the worker and it will automatically pull the task you have crea
 You can go to kibana and check your task, you will see the status going from "NOT_STARTED" 
 to "RUNNING" and "ENDED"
 
+When you are done, go in the ws-backend repo and run `make down` to stop and the elastic containers
+
 That's it folks :)
