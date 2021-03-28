@@ -1,2 +1,2 @@
-WS_DOCKER_LOG_FOLDER: "/Users/jjauzion/42/ws-worker/.logs/"
-WS_DOCKER_RESULT_FOLDER: "/Users/jjauzion/42/ws-worker/.results/"
+WS_DOCKER_LOG_FOLDER: ".logs/"
+WS_DOCKER_RESULT_FOLDER: ".results/"
