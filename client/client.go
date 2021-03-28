@@ -37,8 +37,8 @@ func Run() {
 			time.Sleep(sleepBetweenCall)
 			continue
 		} else if err != nil {
-			time.Sleep(sleepBetweenCall)
 			lg.Error("failed to start task", zap.Error(err))
+			time.Sleep(sleepBetweenCall)
 			continue
 		}
 		lg.Info("starting task", zap.String("id", r.TaskId))

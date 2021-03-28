@@ -61,7 +61,8 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
 
 	dir, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		dh.log.Error("", zap.Error(err))
+		return err
 	}
 	volumes := []mount.Mount{
 		{
