@@ -9,7 +9,7 @@ It consists of a task queue where user can create new jobs and one or more worke
 The jobs are submitted via a Docker image that shall be available on a public container registry.
 
 The project is made of three repositories:
-- the worker node: *the current repo*
+- the worker node: https://github.com/jjauzion/ws-worker
 - the backend server: https://github.com/jjauzion/ws-backend
 - the frontend: *not yet implemented*
 
@@ -23,7 +23,6 @@ This tutorial will guide you through running the whole project.
 - Docker-compose installed
 - go installed
 - makefile support
-- clone the project repositories to your machine
 
 ## Start the backend
 Here we will run the entire project on your local machine from scratch, including the database.
@@ -65,7 +64,7 @@ database:
 - Copy / Paste the following in the console and run it: `GET _cat/indices?v`  
   This list all the index existing in the DB. You should see an index called `task` and one
   called `user`. Index starting with a dot `.` are system index.
-- Now run the following to list all the users existing:
+- Now run the following to list all the existing users:
 ```
 GET user/_search
 {
@@ -131,9 +130,9 @@ mutation tuto_create_user {
   }
 }
 ```
-- if you send the request like this you will get a `403` error which means you are not authenticated (WIP at the moment only create task requires authentication)
-- you need to pass the token we generated in the chapter before. On the bottom of the console, 
-  click on `HTTP HEADERS` and paste the following (replacing the token value with yours):
+- if you send the request like this you will get a `403` error because you are not authenticated (WIP at the moment only create task requires authentication)
+- you need to pass the token we generated in the chapter before: on the bottom of the console, 
+  click on `HTTP HEADERS` and paste the following (replace the token value with yours):
 ```json
 {
   "auth": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdXRob3JpemVkIjp0cnVlLCJleHAiOjE2MTczODMwNTUsInVzZXJfaWQiOiI0MzVmNTA3OC02NjFlLTRkOGMtODJjZS0zNDJhZTQ1ZTQ4MzcifQ.RTzseF7mSjR8aop-9CCiNt1-IkqFGem9nNWymaJKBRo"
@@ -165,7 +164,7 @@ mutation createTask {
   }
 }
 ```
-- if you got a `403` it's because you forgot to add the `auth` Header to your request (see previous chapter)
+- if you got a `403` error, check you didn't forget the `auth` Header in your request (see previous chapter)
 
 Congratulations !! You have created a user and a new jobs :) You can go to the kibana console and run 
 the search to see your creations.
