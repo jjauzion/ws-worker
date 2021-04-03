@@ -61,6 +61,16 @@
                 "name": "dataset",
                 "type": "string"
               }
+            ],
+            "maps": [
+              {
+                "key_type": "string",
+                "field": {
+                  "id": 3,
+                  "name": "env",
+                  "type": "string"
+                }
+              }
             ]
           }
         ],
@@ -87,7 +97,7 @@
         "options": [
           {
             "name": "go_package",
-            "value": ".;proto"
+            "value": "./proto"
           }
         ]
       }

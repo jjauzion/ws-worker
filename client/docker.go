@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"path"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/mount"
@@ -15,6 +14,7 @@ import (
 	"go.uber.org/zap"
 	"io"
 	"os"
+	"path"
 	"strings"
 )
 
