@@ -64,16 +64,12 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 		dh.log.Error("", zap.Error(err))
 		return err
 	}
+	_ = os.Mkdir(dh.config.WS_DOCKER_LOG_FOLDER, os.ModeDir)
 	volumes := []mount.Mount{
 		{
 			Type:   mount.TypeBind,
 			Source: path.Join(dir, dh.config.WS_DOCKER_LOG_FOLDER),
 			Target: "/logs",
-		},
-		{
-			Type:   mount.TypeBind,
-			Source: path.Join(dir, dh.config.WS_DOCKER_RESULT_FOLDER),
-			Target: "/result",
 		},
 	}
 	resp, err := dh.client.ContainerCreate(
