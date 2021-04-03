@@ -28,5 +28,5 @@ message EndTaskRep {
 message Job {
   string dockerImage = 1;
   string dataset = 2;
-  map<string, string> env = 3;
+  repeated string env = 3;
 }

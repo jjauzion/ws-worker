@@ -36,7 +36,7 @@ func (dh *DockerHandler) new(log *logger.Logger, config conf.Configuration) erro
 	return nil
 }
 
-func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
+func (dh *DockerHandler) runImage(ctx context.Context, image string, env []string) error {
 	dh.log.Info("running container", zap.String("image", image))
 	reader, err := dh.client.ImagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
@@ -81,6 +81,7 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string) error {
 		&container.Config{
 			Image: image,
 			Tty:   false,
+			Env:   env,
 		},
 		&container.HostConfig{
 			Mounts: volumes,

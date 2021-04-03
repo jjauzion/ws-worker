@@ -42,7 +42,7 @@ func Run() {
 			continue
 		}
 		lg.Info("starting task", zap.String("id", r.TaskId))
-		err = dh.runImage(ctx, r.Job.DockerImage)
+		err = dh.runImage(ctx, r.Job.DockerImage, r.Job.Env)
 		if err != nil {
 			lg.Error("", zap.Error(err))
 		}

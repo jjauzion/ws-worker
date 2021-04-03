@@ -60,16 +60,12 @@
                 "id": 2,
                 "name": "dataset",
                 "type": "string"
-              }
-            ],
-            "maps": [
+              },
               {
-                "key_type": "string",
-                "field": {
-                  "id": 3,
-                  "name": "env",
-                  "type": "string"
-                }
+                "id": 3,
+                "name": "env",
+                "type": "string",
+                "is_repeated": true
               }
             ]
           }
