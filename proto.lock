@@ -60,12 +60,6 @@
                 "id": 2,
                 "name": "dataset",
                 "type": "string"
-              },
-              {
-                "id": 3,
-                "name": "env",
-                "type": "string",
-                "is_repeated": true
               }
             ]
           }
