@@ -187,6 +187,30 @@ This will start the worker and it will automatically pull the task you have crea
 You can go to kibana and check your task, you will see the status going from "NOT_STARTED" 
 to "RUNNING" and "ENDED"
 
+## Create a Machine Learning task
+Let's create a real job: running a ML jobs and tracking your jobs parameters while it is running.
+
+For this we will use wandb (https://wandb.ai/site) so you must create a user and copy your private key.
+
+Then paste the following in the playground console and put your wandb key in the env variable.
+Your key will be encrypted on the server and will never be stored in clear (WIP, not done yet)
+
+```graphql
+mutation createTask {
+  create_task(input:{env:"WANDB_API_KEY=putYourKeyHere", docker_image:"jjauzion/wandb-test", dataset:"s3//"}) {
+    id
+    user_id
+        created_at
+        started_at
+        ended_at
+        status
+    job { dataset, docker_image, env }
+  }
+}
+```
+Wait until the task status is updated to "RUNNING" (can take up to 30sec), then log to wandb.
+You should see your work ongoing.
+
 When you are done, go in the ws-backend repo and run `make down` to stop and the elastic containers
 
 That's it folks :)
