@@ -124,7 +124,7 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 		return containerLogs, err
 	}
 	if inspect.State.ExitCode != 0 {
-		err := fmt.Errorf("container exited with error code %d", inspect.State.ExitCode)
+		err := fmt.Errorf("container exited with exit code %d", inspect.State.ExitCode)
 		dh.log.Error("", zap.Error(err))
 		return containerLogs, err
 	}
