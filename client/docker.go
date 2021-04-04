@@ -1,6 +1,7 @@
 package client
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
@@ -36,12 +37,13 @@ func (dh *DockerHandler) new(log *logger.Logger, config conf.Configuration) erro
 	return nil
 }
 
-func (dh *DockerHandler) runImage(ctx context.Context, image string, env []string) error {
+// Run a container and returns its logs and an error if container exited with error code != 0
+func (dh *DockerHandler) runImage(ctx context.Context, image string, env []string) (string, error) {
 	dh.log.Info("running container", zap.String("image", image))
 	reader, err := dh.client.ImagePull(ctx, image, types.ImagePullOptions{})
 	if err != nil {
 		dh.log.Error("failed to pull image", zap.Error(err))
-		return err
+		return "", err
 	}
 	buf := new(strings.Builder)
 	io.Copy(buf, reader)
@@ -53,7 +55,7 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 			}{}
 			err := json.Unmarshal([]byte(s), &simple)
 			if err != nil {
-				return fmt.Errorf("cannot unmarshal: %w", err)
+				return "", fmt.Errorf("cannot unmarshal: %w", err)
 			}
 			dh.log.Info("docker " + simple.Status)
 		}
@@ -62,7 +64,7 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 	dir, err := os.Getwd()
 	if err != nil {
 		dh.log.Error("", zap.Error(err))
-		return err
+		return "", err
 	}
 	_ = os.Mkdir(dh.config.WS_DOCKER_LOG_FOLDER, os.ModeDir)
 	volumes := []mount.Mount{
@@ -87,13 +89,13 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 		"")
 	if err != nil {
 		dh.log.Error("failed to create container", zap.Error(err))
-		return err
+		return "", err
 	}
 
 	err = dh.client.ContainerStart(ctx, resp.ID, types.ContainerStartOptions{})
 	if err != nil {
 		dh.log.Error("failed to start container", zap.Error(err))
-		return err
+		return "", err
 	}
 
 	statusCh, errCh := dh.client.ContainerWait(ctx, resp.ID, container.WaitConditionNotRunning)
@@ -101,18 +103,30 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 	case err := <-errCh:
 		if err != nil {
 			dh.log.Error("", zap.Error(err))
-			return err
+			return "", err
 		}
 	case <-statusCh:
 	}
 
-	out, err := dh.client.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true})
+	out, err := dh.client.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		dh.log.Error("", zap.Error(err))
-		return err
+		return "", err
 	}
-
-	dh.log.Info("container says:")
+	var containerLogsByte []byte
 	stdcopy.StdCopy(os.Stdout, os.Stderr, out)
-	return nil
+	io.Copy(bytes.NewBuffer(containerLogsByte), out)
+	containerLogs := string(containerLogsByte)
+
+	inspect, err := dh.client.ContainerInspect(ctx, resp.ID)
+	if err != nil {
+		dh.log.Error("", zap.Error(err))
+		return containerLogs, err
+	}
+	if inspect.State.ExitCode != 0 {
+		err := fmt.Errorf("container exited with error code %d", inspect.State.ExitCode)
+		dh.log.Error("", zap.Error(err))
+		return containerLogs, err
+	}
+	return containerLogs, nil
 }
