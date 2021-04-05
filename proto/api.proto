@@ -1,7 +1,7 @@
 syntax = "proto3";
 package ws_backend;
 
-option go_package = ".;proto";
+option go_package = "./proto";
 
 service Api {
   rpc StartTask (StartTaskReq) returns (StartTaskRep) {}
@@ -19,7 +19,7 @@ message StartTaskRep {
 
 message EndTaskReq {
   string taskId = 1;
-  repeated string error = 2;
+  string error = 2;
 }
 
 message EndTaskRep {
@@ -28,4 +28,5 @@ message EndTaskRep {
 message Job {
   string dockerImage = 1;
   string dataset = 2;
+  repeated string env = 3;
 }
