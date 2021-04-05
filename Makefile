@@ -20,7 +20,7 @@ proto.lock:
 	$(PROTOLOCK) init
 
 .PHONY: lint
-lint: $(SRC_FILES)
+lint:
 	go fmt ./...
 	go vet ./...
 
