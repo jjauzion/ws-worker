@@ -42,12 +42,12 @@ func Run() {
 			continue
 		}
 		lg.Info("starting task", zap.String("id", r.TaskId))
-		_, err = dh.runImage(ctx, r.Job.DockerImage, r.Job.Env)
+		containerLogs, err := dh.runImage(ctx, r.Job.DockerImage, r.Job.Env)
 		var errString string
 		if err != nil {
 			errString = err.Error()
 		}
-		_, err = c.EndTask(ctx, &pb.EndTaskReq{TaskId: r.TaskId, Error: errString})
+		_, err = c.EndTask(ctx, &pb.EndTaskReq{TaskId: r.TaskId, Error: errString, Logs: containerLogs})
 		if err != nil {
 			lg.Error("failed to end task", zap.Error(err))
 		}
