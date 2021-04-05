@@ -9,7 +9,7 @@ PB_FILES = $(patsubst proto/%.proto,proto/%.pb.go,$(wildcard proto/*.proto))
 
 all: $(PB_FILES) lint $(EXE)
 
-$(EXE): $(SRC_FILES)
+$(EXE):
 	go build -o $(EXE)
 
 proto/%.pb.go: proto.lock proto/%.proto
@@ -20,7 +20,7 @@ proto.lock:
 	$(PROTOLOCK) init
 
 .PHONY: lint
-lint:
+lint: $(SRC_FILES)
 	go fmt ./...
 	go vet ./...
 
