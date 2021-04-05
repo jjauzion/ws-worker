@@ -107,19 +107,7 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 	case <-statusCh:
 	}
 
-	inspect, err := dh.client.ContainerInspect(ctx, resp.ID)
-	if err != nil {
-		dh.log.Error("", zap.Error(err))
-		return nil, err
-	}
-	err = nil
-	option := types.ContainerLogsOptions{ShowStdout: true}
-	if inspect.State.ExitCode != 0 {
-		option.ShowStderr = false
-		err = fmt.Errorf("container exited with exit code %d", inspect.State.ExitCode)
-	}
-
-	out, err := dh.client.ContainerLogs(ctx, resp.ID, option)
+	out, err := dh.client.ContainerLogs(ctx, resp.ID, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
 	if err != nil {
 		dh.log.Error("", zap.Error(err))
 		return nil, err
@@ -127,6 +115,16 @@ func (dh *DockerHandler) runImage(ctx context.Context, image string, env []strin
 	buff := new(bytes.Buffer)
 	io.Copy(buff, io.LimitReader(out, dh.config.WS_MAX_LOGS_SIZE))
 	containerLogs := buff.Bytes()
+
+	inspect, err := dh.client.ContainerInspect(ctx, resp.ID)
+	if err != nil {
+		dh.log.Error("", zap.Error(err))
+		return containerLogs, err
+	}
+	err = nil
+	if inspect.State.ExitCode != 0 {
+		err = fmt.Errorf("container exited with exit code %d", inspect.State.ExitCode)
+	}
 
 	return containerLogs, err
 }
