@@ -13,6 +13,7 @@ type Configuration struct {
 	WS_DOCKER_RESULT_FOLDER string
 	WS_SLEEP_BETWEEN_CALL   time.Duration
 	WS_MAX_LOGS_SIZE        int64
+	WS_SERVER_CERT_FILE     string
 }
 
 func GetConfig(log *logger.Logger) (Configuration, error) {
