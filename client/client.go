@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"crypto/tls"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -16,9 +17,18 @@ func Run() {
 		panic(err)
 	}
 
-	creds, err := credentials.NewClientTLSFromFile(cf.WS_SERVER_CERT_FILE, "")
-	if err != nil {
-		lg.Panic("failed to load server cert", zap.Error(err))
+	var creds credentials.TransportCredentials
+	if cf.WS_SERVER_CERT_FILE == "" {
+		tlsConfig := &tls.Config{
+			InsecureSkipVerify: true,
+		}
+		creds = credentials.NewTLS(tlsConfig)
+		lg.Warn("no server cert file provided, grpc server authenticity can't be checked")
+	} else {
+		creds, err = credentials.NewClientTLSFromFile(cf.WS_SERVER_CERT_FILE, "")
+		if err != nil {
+			lg.Panic("failed to load server cert", zap.Error(err))
+		}
 	}
 	address := cf.WS_GRPC_HOST + ":" + cf.WS_GRPC_PORT
 	lg.Info("connecting to grpc server", zap.String("address", address))
