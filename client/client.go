@@ -33,7 +33,6 @@ func Run() {
 	address := cf.WS_GRPC_HOST + ":" + cf.WS_GRPC_PORT
 	lg.Info("connecting to grpc server", zap.String("address", address))
 	conn, err := grpc.Dial(address, grpc.WithTransportCredentials(creds), grpc.WithBlock())
-	//conn, err := grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		lg.Panic("failed to connect", zap.Error(err))
 	}
