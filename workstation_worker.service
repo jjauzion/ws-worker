@@ -5,8 +5,8 @@ Description=Workstation API Service
 Type=simple
 Restart=always
 RestartSec=1
-User=ubuntu
-WorkingDirectory=/home/ubuntu/ws-worker
+User=station
+WorkingDirectory=/home/work_station/ws-worker
 ExecStart=/usr/bin/make run
 
 [Install]
