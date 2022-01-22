@@ -1,0 +1,13 @@
+[Unit]
+Description=Workstation API Service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=work_station
+WorkingDirectory=/home/work_station/ws-worker
+ExecStart=/usr/bin/make run
+
+[Install]
+WantedBy=multi-user.target
